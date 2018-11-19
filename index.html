@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <title>Bar Script</title>
+  </head>
+  <body>
+  
+    <h1>Bar Script</h1>
+    <button id="runbutton" onclick="runScript();">Run Script</button>
+    <div id="tables"></div>
+    <button id="clearbutton" onclick="runClear();" disabled>Archive this set of results</button>
+    <br>
+    <button onclick="var win = window.open(sheeturl, '_blank'); win.focus();">Visit spreadsheet directly</button>
+    <script>
+      var sheeturl = "YOUR SHEET URL";
+      
+      if(sheeturl == "YOUR SHEET URL"){
+        alert("Please make sure to set your sheet url...");
+      }
+      var runtimeout = false;
+      var cleartimeout = false;
+      
+      function tableCreate(data){
+        var newdata = JSON.parse(data);
+        
+        if(newdata === undefined || newdata.length == 0){
+          var body = document.getElementById("tables");
+          body.appendChild("<p>No new data could be found.</p>");
+        } else{
+          var body = document.getElementById("tables");
+          body.innerHTML = '';
+          var tbl = document.createElement('table');
+          tbl.style.width  = '100px';
+          tbl.style.border = '1px solid black';
+          
+          for(i in newdata){
+            var tr = tbl.insertRow();
+            for(j in newdata[i]){
+              if(j == 1 || j == 2){
+                var td = tr.insertCell();
+                td.appendChild(document.createTextNode(newdata[i][j]));
+                td.style.border = '1px solid black';
+              }
+            }
+          }
+          body.appendChild(tbl);
+          document.getElementById("clearbutton").disabled = false;
+        }
+      }
+      
+      function resetButton(button){
+        if(button == 0){
+          var runtimeout = false;
+          document.getElementById("runbutton").innerHTML="Run Script";
+        } else if(button == 1){
+          var cleartimeout = false;
+          document.getElementById("clearbutton").innerHTML="Archive this set of results";
+        }
+      }
+      
+      function runScript(){
+        if(false == false){
+          document.getElementById("clearbutton").disabled = true;
+          console.log("Running");
+          var runtimeout = true;
+          document.getElementById("runbutton").innerHTML="Script running...";
+          google.script.run.withSuccessHandler(runCallback).withFailureHandler(runFailure).addData(sheeturl);
+        }
+      }
+      
+      function runClear(){
+        if(false == false){
+          var cleartimeout = true;
+          document.getElementById("clearbutton").disabled = true;
+          document.getElementById("clearbutton").innerHTML="Clearing sheet...";
+          google.script.run.withSuccessHandler(clearCallback).withFailureHandler(clearFailure).sheetClear(sheeturl);
+        }
+      }
+    
+      function runCallback(data){
+        setTimeout(function(){
+          resetButton(0);
+        },2000);
+        document.getElementById("runbutton").innerHTML="Script Successful!";
+        tableCreate(data);
+      }
+      
+      function clearCallback(){
+        setTimeout(function(){
+          resetButton(1);
+        },2000);
+        document.getElementById("clearbutton").innerHTML="Spreadsheet Archived!";
+        var body = document.getElementById("tables");
+        body.innerHTML = '';
+        document.getElementById("clearbutton").disabled = true;
+      }
+      
+      function runFailure(){
+        setTimeout(function(){
+          resetButton(0);
+        },2000);
+        document.getElementById("runbutton").innerHTML="Failure!";
+      }
+      
+      function clearFailure(){
+        setTimeout(function(){
+          resetButton(1);
+        },2000);
+        document.getElementById("clearbutton").innerHTML="Failure!";
+      }
+      
+    </script>
+  </body>
+</html>
+
+
